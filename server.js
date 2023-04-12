@@ -1,11 +1,27 @@
 ///////////////////////////////
 // Dependencies
 ///////////////////////////////
-const ronin = require('ronin-server')
-const mocks = require('ronin-mocks')
+const ronin 		= require( 'ronin-server' )
+const database  = require( 'ronin-database' )
+const mocks 		= require( 'ronin-mocks' )
 
-const server = ronin.server()
+async function main() {
 
-server.use("/", mocks.server(server.Router(), false, true))
+    try {
+    await database.connect( process.env.CONNECTIONSTRING )
+    
+    const server = ronin.server({
+            port: process.env.SERVER_PORT
+        })
 
-server.start()
+        server.use( '/', mocks.server( server.Router()) )
+
+    const result = await server.start()
+        console.info( result )
+    
+    } catch( error ) {
+        console.error( error )
+    }
+}
+
+main()
